@@ -18,6 +18,21 @@ services:
     networks:
       - network-reactive
 
+  app:
+    build:
+      context: ../
+      dockerfile: deployment/Dockerfile
+    image: users_reactive_app
+    container_name: app_container
+#    depends_on:
+#      - mongo
+#    environment:
+#      - SPRING_DATA_MONGODB_HOST=mongo
+    ports:
+      - "8080:8080"
+    networks:
+      - network-reactive
+
 volumes:
   mongodata:
 

@@ -1,16 +1,6 @@
-FROM adoptopenjdk:11-jre-hotspot as builder
-WORKDIR application
-ARG JAR_FILE=target/*.jar
-COPY ${JAR_FILE} application.jar
+FROM frolvlad/alpine-java:jdk8-slim AS builder
 
-RUN java -Djarmode=layertools -jar application.jar extract
-
-FROM adoptopenjdk:11-jre-hotspot
-WORKDIR application
-COPY application/dependencies/ ./
-COPY application/spring-boot-loader/ ./
-COPY application/snapshot-dependencies/ ./
-#COPY application/resources/ ./
-COPY application/application/ ./
-
-ENTRYPOINT ["java", "org.springframework.boot.loader.JarLauncher"]
+COPY build/libs/users-0.0.1-SNAPSHOT.jar /opt/app/
+RUN echo $(ls -1 /opt/app/)
+CMD ["/usr/bin/java", "-jar", "/opt/app/users-0.0.1-SNAPSHOT.jar"]
+EXPOSE 8080
