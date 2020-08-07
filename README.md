@@ -3,6 +3,10 @@ A demo project that provides:
 * reactive CRUD APIs
 * reactive authentication using a JWT token
 
+#### Motivated by
+* [The Reactive Manifesto](https://www.reactivemanifesto.org/)
+* [Reactive Systems](https://www.youtube.com/watch?v=f-voUsRxw6c)
+
 #### Technologies used
 * Spring Boot - 2.4.0-SNAPSHOT
 * Spring WebFlux
