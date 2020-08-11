@@ -21,7 +21,7 @@ A demo project that provides:
     * Engine 19.03.8, 
     * Compose: 1.25.5
 
-#### How to set up
+#### TODO: How to set up 
 
 ###### docker commands
 ```
@@ -39,10 +39,8 @@ A demo project that provides:
 
 > docker exec -it container_id bash // enter a container
 ```
-###### mongodb commands
 
-
-## Running mongodb with docker
+###### Running mongodb with docker
 ```
 > docker exec -it mongodb bash
 To launch the MongoDB shell client, execute the following
