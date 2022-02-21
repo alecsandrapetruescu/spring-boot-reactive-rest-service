@@ -60,3 +60,5 @@ db.users.find({ firstname: "Nic" })
 remove all documents in a collection
 > db.users.remove({})
 ```
+
+### [Code of conduct](https://raw.githubusercontent.com/eclipse/.github/master/CODE_OF_CONDUCT.md)
