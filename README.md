@@ -1,4 +1,4 @@
-## User Administration - Restful Reactive Application
+## Reactive REST microservice
 A demo project that provides:
 * reactive CRUD APIs
 * reactive authentication using a JWT token
