@@ -1,19 +1,29 @@
 package com.example.users.components;
 
 import com.example.users.security.configurations.TokenProvider;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.test.util.ReflectionTestUtils;
 
 import static org.springframework.test.util.AssertionErrors.assertEquals;
 import static org.springframework.test.util.AssertionErrors.assertNotNull;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ExtendWith(MockitoExtension.class)
 class TokenProviderTests {
 
-	@Autowired
+	@InjectMocks
 	TokenProvider tokenProvider;
+
+	@BeforeEach
+	public void setUp() {
+		ReflectionTestUtils.setField(tokenProvider, "jwtSecret", "demoSecretKey");
+		ReflectionTestUtils.setField(tokenProvider, "jwtExpirationMs", 86400000);
+		ReflectionTestUtils.setField(tokenProvider, "authoritiesKeys", "scopes");
+	}
 
 	@Test
 	public void testGenerateToken() {
