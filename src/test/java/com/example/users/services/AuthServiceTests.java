@@ -1,18 +1,20 @@
 package com.example.users.services;
 
+import com.example.users.security.configurations.TokenProvider;
 import com.example.users.security.dto.Authenticated;
-import com.example.users.security.service.AuthService;
+import com.example.users.security.service.UserDetailsServiceImpl;
 import com.example.users.user.models.User;
 import com.example.users.user.repository.UserRepository;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.InjectMocks;
+import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.mockito.stubbing.Answer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -24,19 +26,20 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.when;
 
-@SpringBootTest(webEnvironment = SpringBootTest.WebEnvironment.RANDOM_PORT)
+@ExtendWith(MockitoExtension.class)
 class AuthServiceTests {
 
 	private static final Logger logger = LoggerFactory.getLogger(AuthServiceTests.class);
 
-	@Autowired
-	AuthService service;
+	@InjectMocks
+	UserDetailsServiceImpl service;
 
-	@MockBean
+	@Mock
 	private UserRepository repository;
-
-	@MockBean
-	PasswordEncoder encoder;
+	@Mock
+	private PasswordEncoder encoder;
+	@Mock
+	private TokenProvider tokenProvider;
 
 	@Test
 	public void testAuthenticate() {
@@ -45,10 +48,9 @@ class AuthServiceTests {
 		UsernamePasswordAuthenticationToken request = new UsernamePasswordAuthenticationToken(userName, password);
 
 		User user = new User();
-		user.setId("1");
 		user.setUsername(userName);
-		user.setPassword(encoder.encode(password));
 
+		given(encoder.matches(request.getCredentials().toString(), user.getPassword())).willReturn(true);
 		given(repository.findByUsername(userName)).willReturn(Mono.just(user));
 		Authenticated authentication = service.authenticate(request).block();
 		assertNotNull(authentication);
@@ -61,13 +63,9 @@ class AuthServiceTests {
 		String password = "password";
 		UsernamePasswordAuthenticationToken request = new UsernamePasswordAuthenticationToken(userName, password);
 
-		User user = new User();
-		user.setId("1");
-		user.setUsername(userName);
-
 		given(repository.findByUsername(userName)).willReturn(Mono.empty());
 
-		assertThrows(UsernameNotFoundException.class, () -> service.authenticate(request));
+		assertThrows(UsernameNotFoundException.class, () -> service.authenticate(request).block());
 	}
 
 	@Test
@@ -77,12 +75,12 @@ class AuthServiceTests {
 		UsernamePasswordAuthenticationToken request = new UsernamePasswordAuthenticationToken(userName, password);
 
 		User user = new User();
-		user.setId("1");
 		user.setUsername(userName);
 
-		given(repository.findByUsername(userName)).willReturn(Mono.empty());
+		given(repository.findByUsername(userName)).willReturn(Mono.just(user));
+		given(encoder.matches(request.getCredentials().toString(), user.getPassword())).willReturn(false);
 
-		assertThrows(BadCredentialsException.class, () -> service.authenticate(request));
+		assertThrows(BadCredentialsException.class, () -> service.authenticate(request).block());
 	}
 
 
@@ -93,10 +91,7 @@ class AuthServiceTests {
 		UsernamePasswordAuthenticationToken request = new UsernamePasswordAuthenticationToken(userName, password);
 
 		User user = new User();
-		user.setId("1");
 		user.setUsername(userName);
-		String encodedPassword = encoder.encode(password);
-		user.setPassword(encodedPassword);
 
 		when(repository.findByUsername(userName))
 				.thenAnswer(new Answer<Object>() {
@@ -120,9 +115,7 @@ class AuthServiceTests {
 		UsernamePasswordAuthenticationToken request = new UsernamePasswordAuthenticationToken(userName, password);
 
 		User user = new User();
-		user.setId("1");
 		user.setUsername(userName);
-		user.setPassword(encoder.encode(password));
 
 		given(repository.findByUsername(userName)).willReturn(Mono.just(user));
 

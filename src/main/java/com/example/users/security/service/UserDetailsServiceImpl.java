@@ -17,8 +17,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
 
-import java.util.Objects;
-
 @Service
 public class UserDetailsServiceImpl implements ReactiveUserDetailsService, AuthService {
 
@@ -46,19 +44,14 @@ public class UserDetailsServiceImpl implements ReactiveUserDetailsService, AuthS
     @Override
     public Mono<Authenticated> authenticate(Authentication request) {
         return repository.findByUsername(request.getName())
-                .switchIfEmpty(Mono.defer(() -> Mono.just(new User())))
+                .switchIfEmpty(Mono.error(new UsernameNotFoundException("Error: User Not Found!")))
                 .flatMap(user -> {
                     logger.info("User is: {}", user);
-                    if (Objects.isNull(user.getId())) {
-                        return Mono.error(new UsernameNotFoundException("Error: User Not Found!"));
-                    }
 
                     if (!encoder.matches(request.getCredentials().toString(), user.getPassword())) {
                         return Mono.error(new BadCredentialsException("Error: Invalid username or password!"));
-                    } else {
-                        return Mono.just(new Authenticated(tokenProvider.generateToken(request)));
                     }
-
+                    return Mono.just(new Authenticated(tokenProvider.generateToken(request)));
                 });
     }
 
