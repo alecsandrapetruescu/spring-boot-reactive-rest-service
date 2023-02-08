@@ -1,14 +1,13 @@
 plugins {
-	id 'org.springframework.boot' version '2.4.0-SNAPSHOT'
-	id 'io.spring.dependency-management' version '1.0.9.RELEASE'
-	id 'java-library'
+	id 'java'
+	id 'org.springframework.boot' version '3.0.2'
+	id 'io.spring.dependency-management' version '1.1.0'
 }
 
 group = 'com.example'
 version = '0.0.1-SNAPSHOT'
-sourceCompatibility = '1.8'
-//sourceEncoding = 'UTF-8'
-//outputEncoding = 'UTF-8'
+sourceCompatibility = JavaVersion.VERSION_17
+targetCompatibility = JavaVersion.VERSION_17
 
 repositories {
 	mavenCentral()
@@ -34,6 +33,6 @@ dependencies {
 	testImplementation 'org.springframework.security:spring-security-test'
 }
 
-test {
+tasks.named('test') {
 	useJUnitPlatform()
 }
