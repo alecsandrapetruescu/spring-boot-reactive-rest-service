@@ -17,7 +17,7 @@ A demo project that provides:
 
 #### Prerequisites
 
-* [Java 17]()
+* [Java 21](https://aws.amazon.com/corretto/)
 * [Docker](https://docs.docker.com/engine/)
   * Docker Engine - Community Version: 23.0.0
   * Compose: v2.15.1
